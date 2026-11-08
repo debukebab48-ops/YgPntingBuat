@@ -40,11 +40,10 @@
   <script type="module">
     import { assertEqual, assertClose, assertTrue } from './assert.js';
 
-    const params = new URLSearchParams(location.search);
-    const only = params.get('case');
     const cases = [
-      { name: 'scaffold', path: './scaffold.test.js' }
-    ];
+  { name: 'scaffold', path: './scaffold.test.js' },
+  { name: 'scene', path: './scene.test.js' }
+];
 
     const selected = only ? cases.filter((c) => c.name === only) : cases;
     const output = document.getElementById('results');
