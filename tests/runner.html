@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Runner</title>
+  <style>
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #101820;
+    }
+
+    #scene-canvas {
+      position: fixed;
+      inset: 0;
+      display: block;
+      width: 100%;
+      height: 100%;
+    }
+
+    #results {
+      position: relative;
+      z-index: 1;
+      margin: 1rem;
+      padding: 1rem;
+      background: #ffffffee;
+      color: #111;
+      font: 14px/1.4 monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="scene-canvas"></canvas>
+  <pre id="results">Running…</pre>
+
+  <script type="module">
+    import { assertEqual, assertClose, assertTrue } from './assert.js';
+
+    const params = new URLSearchParams(location.search);
+    const only = params.get('case');
+    const cases = [
+      { name: 'scaffold', path: './scaffold.test.js' }
+    ];
+
+    const selected = only ? cases.filter((c) => c.name === only) : cases;
+    const output = document.getElementById('results');
+    const lines = [];
+    let failures = 0;
+
+    for (const testCase of selected) {
+      try {
+        const mod = await import(testCase.path);
+        await mod.default({ assertEqual, assertClose, assertTrue });
+        lines.push(`PASS ${testCase.name}`);
+      } catch (error) {
+        failures += 1;
+        lines.push(`FAIL ${testCase.name}\n${error?.stack || error}`);
+      }
+    }
+
+    output.textContent = `${lines.join('\n\n')}\n\n${failures ? 'FAILED' : 'OK'}`;
+    document.title = failures ? 'FAIL' : 'PASS';
+  </script>
+</body>
+</html>
